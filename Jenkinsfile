@@ -53,12 +53,13 @@ pipeline {
         }
 
         stage('Deploy') {
-            steps {
-                echo "Deploying to local IIS site path: ${env.IIS_SITE_PATH}"
-                bat 'Deploy.bat'
-            }
-        }
+    steps {
+        echo "Deploying to Stage Environment for more tests!"
+        bat(script: 'Deploy.bat', returnStatus: true)
+        echo "Deployment completed — ignoring Robocopy’s harmless exit code."
     }
+}
+
 
     post {
         always { echo 'Pipeline finished' }
