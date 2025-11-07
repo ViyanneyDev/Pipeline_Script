@@ -21,3 +21,5 @@ if %errorlevel% GEQ 8 (
 )
 
 echo Deploy complete.
+exit /b 0
+
