@@ -15,11 +15,12 @@ echo Deploying from %SRC% to %DEST%
 if not exist "%DEST%" mkdir "%DEST%"
 robocopy "%SRC%" "%DEST%" /MIR /XD node_modules .git .github
 
-if %errorlevel% GEQ 8 (
-  echo Robocopy reported a failure (errorlevel %errorlevel%)
-  exit /b %errorlevel%
+REM Robocopy exit codes: 0–7 are OK, >=8 are failures
+set RC=%errorlevel%
+if %RC% GEQ 8 (
+  echo Robocopy reported a failure (errorlevel %RC%)
+  exit /b %RC%
+) else (
+  echo Robocopy completed successfully (exit code %RC%)
+  exit /b 0
 )
-
-echo Deploy complete.
-exit /b 0
-
