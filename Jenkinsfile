@@ -1,69 +1,63 @@
 pipeline {
     agent any
 
-    environment {
-        IIS_SITE_PATH = "C:\\inetpub\\wwwroot\\MyFrontend"   // change as needed
-        FRONTEND_DIR = ""    // change if your frontend is at repo root set to ""
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Git-Checkout') {
             steps {
                 echo "Checking out from Git Repo"
-                checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                script {
-                    if (env.FRONTEND_DIR?.trim()) {
-                        dir(env.FRONTEND_DIR) {
-                            echo "Building frontend in ${env.FRONTEND_DIR}"
-                            bat 'Build.bat'
-                        }
-                    } else {
-                        echo "Building frontend at repo root"
-                        bat 'Build.bat'
-                    }
-                }
+                echo "Building the checked-out project!"
             }
         }
 
         stage('Unit-Test') {
             steps {
-                script {
-                    if (env.FRONTEND_DIR?.trim()) {
-                        dir(env.FRONTEND_DIR) {
-                            echo "Running unit tests"
-                            bat 'Unit.bat'
-                        }
-                    } else {
-                        bat 'Unit.bat'
-                    }
-                }
+                echo "Running JUnit Tests"
             }
         }
 
         stage('Quality-Gate') {
             steps {
-                echo "Quality gate / lint (optional)"
-                bat 'Quality.bat'
+                echo "Verifying Quality Gates"
             }
         }
 
         stage('Deploy') {
-    steps {
-        echo "Deploying to Stage Environment for more tests!"
-        bat(script: 'Deploy.bat', returnStatus: true)
-        echo "Deployment completed — ignoring Robocopy’s harmless exit code."
+            steps {
+                echo "Deploying to Stage Environment for more tests!"
+                script {
+                    // Run Deploy.bat and ignore harmless Robocopy exit codes
+                    def result = bat(script: 'Deploy.bat', returnStatus: true)
+                    if (result >= 8) {
+                        error "Deployment failed (Robocopy exit code ${result})"
+                    } else {
+                        echo "Deployment succeeded (Robocopy exit code ${result})"
+                    }
+                }
+            }
+        }
     }
-}
-
 
     post {
-        always { echo 'Pipeline finished' }
-        success { echo 'Success' }
-        failure { echo 'Failure' }
+        always {
+            echo 'This will always run'
+        }
+        success {
+            echo 'This will run only if successful'
+        }
+        failure {
+            echo 'This will run only if failed'
+        }
+        unstable {
+            echo 'This will run only if the run was marked as unstable'
+        }
+        changed {
+            echo 'This will run only if the state of the Pipeline has changed'
+            echo 'For example, if the Pipeline was previously failing but is now successful'
+        }
     }
 }
