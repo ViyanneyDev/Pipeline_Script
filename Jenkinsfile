@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IIS_SITE_PATH = "C:\\inetpub\\wwwroot\\MyFrontend"   // change as needed
-        FRONTEND_DIR = "frontend"    // change if your frontend is at repo root set to ""
+        FRONTEND_DIR = ""    // change if your frontend is at repo root set to ""
     }
 
     stages {
